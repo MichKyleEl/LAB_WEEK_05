@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val apiResponseView: TextView by lazy{
-        findViewById(R.id.api_response)
+        findViewById(R.id.breed_type)
     }
 
     private val imageResultView: ImageView by lazy {
@@ -59,15 +59,22 @@ class MainActivity : AppCompatActivity() {
                                     response: Response<List<ImageData>>) {
                 if(response.isSuccessful){
                     val image = response.body()
+                    val first = image?.firstOrNull()
                     val firstImage = image?.firstOrNull()?.imageUrl.orEmpty()
+                    val breeds = first?.breeds.orEmpty()
                     if (firstImage.isNotBlank()) {
                         imageLoader.loadImage(firstImage, imageResultView)
                     } else {
                         Log.d(MAIN_ACTIVITY, "Missing image URL")
                     }
 
-                    apiResponseView.text = getString(R.string.image_placeholder,
-                        firstImage)
+                    val breedName = breeds.firstOrNull()?.name.orEmpty()
+
+                    if (breedName.isNotBlank()) {
+                        apiResponseView.text = getString(R.string.image_placeholder, breedName)
+                    } else {
+                        apiResponseView.text = getString(R.string.image_placeholder, "Unknown")
+                    }
                 }
                 else{
                     Log.e(MAIN_ACTIVITY, "Failed to get response\n" +
